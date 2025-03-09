@@ -16,3 +16,8 @@ A modern, sleek terminal dashboard for monitoring Fail2ban's SSH jail status. Th
 2. Make it executable:
    ```bash
    sudo chmod +x /etc/profile.d/fail2ban_status.sh
+
+## Additional Usage Options
+
+For those who prefer an automatic display at every login, placing the script in /etc/profile.d/ is recommended. However, the choice of execution is entirely flexible: you may run it manually, integrate it into another startup mechanism, or execute it in any context that best suits your workflow. This adaptability allows you to tailor the script's behavior to your specific needs.
+
