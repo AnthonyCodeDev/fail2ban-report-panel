@@ -1,6 +1,6 @@
 # Fail2ban Monitor
 
-### ![English](https://flagcdn.com/28x21/gb.png) English
+### ![English](https://flagcdn.com/20x15/gb.png) English
 
 
 
@@ -26,7 +26,7 @@ A modern, sleek terminal dashboard for monitoring Fail2ban's SSH jail status. Th
 For those who prefer an automatic display at every login, placing the script in `/etc/profile.d/` is recommended. However, the choice of execution is entirely flexible: you may run it manually, integrate it into another startup mechanism, or execute it in any context that best suits your workflow. This adaptability allows you to tailor the script's behavior to your specific needs.
 
 
-### ![Français](https://flagcdn.com/28x21/fr.png) Français
+### ![Français](https://flagcdn.com/20x15/fr.png) Français
 
 Un tableau de bord moderne et épuré pour surveiller l'état du jail SSH de Fail2ban directement depuis le terminal. Ce dépôt contient un script Bash permettant d'afficher un rapport complet sur Fail2ban, incluant un tableau récapitulatif des IP bannies, le nombre de tentatives et des entrées détaillées des logs—le tout présenté avec un thème bleu uniforme, rappelant les panneaux de contrôle haut de gamme.
 
