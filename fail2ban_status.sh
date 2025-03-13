@@ -1,11 +1,12 @@
 #!/bin/bash
-# Ce script affiche un rapport complet et moderne pour la jail sshd de Fail2ban.
-# Il se base sur /var/log/auth.log pour extraire les données des tentatives "Failed password".
+# Ce script affiche un rapport Fail2ban pour la jail sshd en se basant sur /var/log/auth.log.
+# Il génère aussi un tableau combiné avec les 5 ports et les 5 utilisateurs les plus sollicités
+# et affiche la configuration de la jail (après combien d'essais, durée du ban, etc).
 # Adaptez le chemin LOGFILE si nécessaire.
 
 LOGFILE="/var/log/auth.log"
 
-# Récupérer le statut de la jail sshd via fail2ban-client
+# Récupération du statut de la jail sshd via fail2ban-client
 status=$(fail2ban-client status sshd 2>/dev/null)
 if [ -z "$status" ]; then
     echo "⚠️  Fail2ban ou la jail 'sshd' ne semble pas être configurée."
@@ -17,12 +18,9 @@ currently=$(echo "$status" | grep "Currently banned:" | awk -F':' '{print $2}' |
 total=$(echo "$status" | grep "Total banned:" | awk -F':' '{print $2}' | xargs)
 banned_list=$(echo "$status" | grep "Banned IP list:" | cut -d':' -f2- | xargs)
 
-# Création d'un fichier temporaire pour stocker les infos détaillées par IP
+# Fichier temporaire pour les détails par IP
 temp_file=$(mktemp)
-
-# Pour chaque IP bannie, extraire les infos dans le log
 for ip in $banned_list; do
-    # Filtrer les lignes contenant "Failed password" pour l'IP dans le fichier de log
     lines=$(grep -E "Failed password.*$ip" "$LOGFILE")
     fail_count=$(echo "$lines" | wc -l | xargs)
     if [ "$fail_count" -gt 0 ]; then
@@ -36,35 +34,74 @@ for ip in $banned_list; do
     echo "$fail_count|$ip|$first_date|$last_date" >> "$temp_file"
 done
 
-# Trier les IP par nombre d'échecs décroissant et limiter à 10 entrées
 sorted_ips=$(sort -t"|" -nr "$temp_file" | head -n 10)
 
-# Préparation des codes couleur et style
+# Codes de formatage et séparateur simplifié
 BOLD=$(tput bold)
 RESET=$(tput sgr0)
-GREEN=$(tput setaf 2)
-BLUE=$(tput setaf 3)
+YELLOW=$(tput setaf 3)
+sep="----------------------------------------"
 
-# Définir un séparateur moderne
-separator="────────────────────────────────────────────────────────────"
-
-# Affichage du rapport formaté
+# Rapport Fail2ban
 echo ""
-echo "${BLUE}${BOLD}${separator}${RESET}"
-echo "${BLUE}${BOLD}               FAIL2BAN REPORT - SSHD               ${RESET}"
-echo "${BLUE}${BOLD}${separator}${RESET}"
-printf "${BLUE}%-25s: ${RESET}%s\n" "IPs Currently Banned" "$currently"
-printf "${BLUE}%-25s: ${RESET}%s\n" "Total Bans" "$total"
-echo "${BLUE}${BOLD}${separator}${RESET}"
-echo ""
-# En-tête du tableau en vert
-printf "${GREEN}${BOLD}%-20s %-10s %-20s %-20s${RESET}\n" "IP Address" "Attempts" "First Attempt" "Last Attempt"
-echo "${GREEN}${separator}${RESET}"
-# Affichage de chaque ligne en bleu
+echo "${YELLOW}${BOLD}${sep}${RESET}"
+echo "${YELLOW}${BOLD}FAIL2BAN REPORT - SSHD${RESET}"
+echo "${YELLOW}${BOLD}${sep}${RESET}"
+printf "IPs Banned: %s\n" "$currently"
+printf "Total Bans: %s\n" "$total"
+echo "${YELLOW}${BOLD}${sep}${RESET}"
+printf "%-15s %-10s %-15s %-15s\n" "IP Address" "Attempts" "First Attempt" "Last Attempt"
+echo "$sep"
 while IFS="|" read -r attempts ip first_attempt last_attempt; do
-    printf "${BLUE}%-20s %-10s %-20s %-20s${RESET}\n" "$ip" "$attempts" "$first_attempt" "$last_attempt"
+    printf "%-15s %-10s %-15s %-15s\n" "$ip" "$attempts" "$first_attempt" "$last_attempt"
 done <<< "$sorted_ips"
-echo "${BLUE}${BOLD}${separator}${RESET}"
+echo "${YELLOW}${BOLD}${sep}${RESET}"
 echo ""
 
 rm "$temp_file"
+
+# Extraction des Top 5 Ports et Users (format: "valeur tentative")
+ports_file=$(mktemp)
+users_file=$(mktemp)
+
+# Pour les ports, récupérer le numéro suivant "port", compter, trier et formater
+grep "Failed password" "$LOGFILE" | awk '{for(i=1;i<=NF;i++){if($i=="port"){print $(i+1)}}}' \
+  | sort | uniq -c | sort -nr | head -n 5 | awk '{print $2" "$1}' > "$ports_file"
+
+# Pour les users, gérer "invalid user" : si le mot après "for" est "invalid", le user est le 3ème token après.
+grep "Failed password" "$LOGFILE" | awk '{
+  for(i=1;i<=NF;i++){
+    if($i=="for"){
+      if($(i+1)=="invalid"){
+        print $(i+3)
+      } else {
+        print $(i+1)
+      }
+    }
+  }
+}' | sort | uniq -c | sort -nr | head -n 5 | awk '{print $2" "$1}' > "$users_file"
+
+# Affichage du tableau combiné
+echo "${YELLOW}${BOLD}Top 5 Ports and Users${RESET}"
+echo "${YELLOW}${BOLD}${sep}${RESET}"
+printf "%-20s %-20s\n" "Port (Attempts)" "User (Attempts)"
+echo "$sep"
+paste "$ports_file" "$users_file" | while IFS=$'\t' read -r port_line user_line; do
+    printf "%-20s %-20s\n" "$port_line" "$user_line"
+done
+echo ""
+
+rm "$ports_file" "$users_file"
+
+# Affichage de la configuration Fail2ban pour la jail sshd
+config_bantime=$(fail2ban-client get sshd bantime 2>/dev/null)
+config_findtime=$(fail2ban-client get sshd findtime 2>/dev/null)
+config_maxretry=$(fail2ban-client get sshd maxretry 2>/dev/null)
+
+echo "${YELLOW}${BOLD}Configuration Fail2ban (jail sshd)${RESET}"
+echo "${YELLOW}${BOLD}${sep}${RESET}"
+printf "Bantime  : %s sec\n" "$config_bantime"
+printf "Findtime : %s sec\n" "$config_findtime"
+printf "Maxretry : %s tentatives\n" "$config_maxretry"
+echo "${YELLOW}${BOLD}${sep}${RESET}"
+echo ""
