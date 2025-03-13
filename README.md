@@ -20,7 +20,11 @@ A modern, sleek terminal dashboard for monitoring Fail2ban's SSH jail status. Th
 2. Make it executable:
    ```bash
    sudo chmod +x /etc/profile.d/fail2ban_status.sh
-  
+3. Run it directly :
+   ```bash
+   ./fail2ban_status.sh
+   ```
+   
 ## Result
   
 ```bash
@@ -54,7 +58,7 @@ Configuration Fail2ban (jail sshd)
 ----------------------------------------
 Bantime  : 600 sec
 Findtime : 600 sec
-Maxretry : 5 tentatives
+Maxretry : 5 attempts
 ```
   
 ## Additional Usage Options
@@ -81,6 +85,11 @@ Un tableau de bord moderne et épuré pour surveiller l'état du jail SSH de Fai
 2. Rendre le script exécutable :
    ```bash
    sudo chmod +x /etc/profile.d/fail2ban_status.sh
+   ```
+3. Executez-le directement :
+   ```bash
+   ./fail2ban_status.sh
+   ```
   
 ## Résultat
   
@@ -115,7 +124,7 @@ Configuration Fail2ban (jail sshd)
 ----------------------------------------
 Bantime  : 600 sec
 Findtime : 600 sec
-Maxretry : 5 tentatives
+Maxretry : 5 attempts
 ```
   
 ## Options d'utilisation supplémentaires
