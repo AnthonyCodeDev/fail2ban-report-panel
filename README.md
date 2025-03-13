@@ -25,6 +25,10 @@ A modern, sleek terminal dashboard for monitoring Fail2ban's SSH jail status. Th
    ./fail2ban_status.sh
    ```
    
+## Additional Usage Options
+
+For those who prefer an automatic display at every login, placing the script in `/etc/profile.d/` is recommended. However, the choice of execution is entirely flexible: you may run it manually, integrate it into another startup mechanism, or execute it in any context that best suits your workflow. This adaptability allows you to tailor the script's behavior to your specific needs.
+  
 ## Result
   
 ```bash
@@ -61,10 +65,6 @@ Findtime : 600 sec
 Maxretry : 5 attempts
 ```
   
-## Additional Usage Options
-
-For those who prefer an automatic display at every login, placing the script in `/etc/profile.d/` is recommended. However, the choice of execution is entirely flexible: you may run it manually, integrate it into another startup mechanism, or execute it in any context that best suits your workflow. This adaptability allows you to tailor the script's behavior to your specific needs.
-  
 <hr>  
   
 ### ![Français](https://flagcdn.com/20x15/fr.png) Français
@@ -91,6 +91,10 @@ Un tableau de bord moderne et épuré pour surveiller l'état du jail SSH de Fai
    ./fail2ban_status.sh
    ```
   
+## Options d'utilisation supplémentaires
+
+Pour un affichage automatique à chaque connexion, il est recommandé de placer le script dans /etc/profile.d/. Toutefois, son exécution reste totalement flexible : vous pouvez le lancer manuellement, l’intégrer à un autre mécanisme de démarrage ou l'exécuter dans n'importe quel contexte adapté à votre flux de travail. Cette souplesse vous permet d’adapter le comportement du script selon vos besoins spécifiques.
+
 ## Résultat
   
 ```bash
@@ -127,6 +131,3 @@ Findtime : 600 sec
 Maxretry : 5 attempts
 ```
   
-## Options d'utilisation supplémentaires
-
-Pour un affichage automatique à chaque connexion, il est recommandé de placer le script dans /etc/profile.d/. Toutefois, son exécution reste totalement flexible : vous pouvez le lancer manuellement, l’intégrer à un autre mécanisme de démarrage ou l'exécuter dans n'importe quel contexte adapté à votre flux de travail. Cette souplesse vous permet d’adapter le comportement du script selon vos besoins spécifiques.
