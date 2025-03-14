@@ -16,18 +16,32 @@ A modern, sleek terminal dashboard for monitoring Fail2ban's SSH jail status. Th
 
 ## Usage
 
-1. Copy the script into `/etc/profile.d/fail2ban_status.sh`.
+1. Copy the script to `/root/fail2ban_status.sh`.
 2. Make it executable:
    ```bash
-   sudo chmod +x /etc/profile.d/fail2ban_status.sh
-3. Run it directly :
-   ```bash
-   ./fail2ban_status.sh
+   sudo chmod +x /root/fail2ban_status.sh
    ```
-   
+3. Edit `/root/.bashrc` and add the following line at the end:
+   ```bash
+   if [[ $- == *i* ]]; then
+       /root/fail2ban_status.sh || echo "⚠️ Erreur lors de l'exécution du script Fail2ban."
+   fi
+   ```
+4. Apply the changes by running:
+   ```bash
+   source /root/.bashrc
+   ```
+5. Run the script manually if needed:
+   ```bash
+   /root/fail2ban_status.sh
+   ```
+
 ## Additional Usage Options
 
-For those who prefer an automatic display at every login, placing the script in `/etc/profile.d/` is recommended. However, the choice of execution is entirely flexible: you may run it manually, integrate it into another startup mechanism, or execute it in any context that best suits your workflow. This adaptability allows you to tailor the script's behavior to your specific needs.
+By adding the execution command to `/root/.bashrc`, the script will run automatically each time the root user logs in via SSH. This method ensures that the script is executed only in interactive sessions, preventing unintended execution in non-interactive environments.
+
+If you prefer manual execution, simply run the script when needed without modifying `.bashrc`. This flexibility allows you to tailor the script's behavior to your specific needs.
+
   
 ## Result
   
@@ -81,19 +95,32 @@ Un tableau de bord moderne et épuré pour surveiller l'état du jail SSH de Fai
 
 ## Utilisation
 
-1. Copier le script dans `/etc/profile.d/fail2ban_status.sh`.
-2. Rendre le script exécutable :
+1. Copiez le script dans `/root/fail2ban_status.sh`.
+2. Rendez-le exécutable :
    ```bash
-   sudo chmod +x /etc/profile.d/fail2ban_status.sh
+   sudo chmod +x /root/fail2ban_status.sh
    ```
-3. Executez-le directement :
+3. Éditez `/root/.bashrc` et ajoutez la ligne suivante à la fin :
    ```bash
-   ./fail2ban_status.sh
+   if [[ $- == *i* ]]; then
+       /root/fail2ban_status.sh || echo "⚠️ Erreur lors de l'exécution du script Fail2ban."
+   fi
    ```
-  
+4. Appliquez les modifications en exécutant :
+   ```bash
+   source /root/.bashrc
+   ```
+5. Exécutez le script manuellement si nécessaire :
+   ```bash
+   /root/fail2ban_status.sh
+   ```
+
 ## Options d'utilisation supplémentaires
 
-Pour un affichage automatique à chaque connexion, il est recommandé de placer le script dans /etc/profile.d/. Toutefois, son exécution reste totalement flexible : vous pouvez le lancer manuellement, l’intégrer à un autre mécanisme de démarrage ou l'exécuter dans n'importe quel contexte adapté à votre flux de travail. Cette souplesse vous permet d’adapter le comportement du script selon vos besoins spécifiques.
+En ajoutant la commande d’exécution à `/root/.bashrc`, le script s'exécutera automatiquement à chaque connexion de l'utilisateur root via SSH. Cette méthode garantit que le script ne s'exécute que dans des sessions interactives, évitant ainsi toute exécution involontaire dans des environnements non interactifs.
+
+Si vous préférez une exécution manuelle, vous pouvez simplement lancer le script au besoin sans modifier `.bashrc`. Cette flexibilité vous permet d'adapter le comportement du script à vos besoins spécifiques.
+
 
 ## Résultat
   
