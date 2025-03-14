@@ -79,6 +79,26 @@ Findtime : 600 sec
 Maxretry : 5 attempts
 ```
   
+### Troubleshooting
+
+It is possible that if you execute `./fail2ban_status.sh` you might see the following error:
+
+```
+bash: ./fail2ban_status.sh: cannot execute: required file not found
+```
+
+If you encounter this error, don't worry. Run the following command to change the file encoding so that the script can be executed:
+
+```
+dos2unix ./fail2ban_status.sh
+```
+
+If you don't have `dos2unix` installed, you can install it with:
+
+```
+apt install dos2unix
+```
+
 <hr>  
   
 ### ![Français](https://flagcdn.com/20x15/fr.png) Français
@@ -157,4 +177,23 @@ Bantime  : 600 sec
 Findtime : 600 sec
 Maxretry : 5 attempts
 ```
-  
+
+### Dépannage
+
+Il est possible que, si vous exécutez `./fail2ban_status.sh` vous rencontriez l'erreur suivante :
+
+```
+bash: ./fail2ban_status.sh: cannot execute: required file not found
+```
+
+Si vous rencontrez cette erreur, ne vous inquiétez pas. Exécutez la commande suivante pour modifier l'encodage du fichier, afin que le script puisse être exécuté :
+
+```
+dos2unix ./fail2ban_status.sh
+```
+
+Si vous n'avez pas `dos2unix` installé, vous pouvez l'installer avec :
+
+```
+apt install dos2unix
+```
