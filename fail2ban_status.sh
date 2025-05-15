@@ -15,13 +15,19 @@ fi
 
 # Extraction des informations de base
 currently=$(echo "$status" | grep "Currently banned:" | awk -F':' '{print $2}' | xargs)
-total=$(echo "$status" | grep "Total banned:" | awk -F':' '{print $2}' | xargs)
+total=$(echo "$status" | grep "Total banned:"     | awk -F':' '{print $2}' | xargs)
 banned_list=$(echo "$status" | grep "Banned IP list:" | cut -d':' -f2- | xargs)
 
 # Fichier temporaire pour les détails par IP
 temp_file=$(mktemp)
 for ip in $banned_list; do
-    lines=$(grep -E "Failed password.*$ip" "$LOGFILE")
+    # Si le fichier de logs existe, on cherche les échecs de mot de passe pour cette IP
+    if [ -f "$LOGFILE" ]; then
+        lines=$(grep -E "Failed password.*$ip" "$LOGFILE")
+    else
+        lines=""
+    fi
+
     fail_count=$(echo "$lines" | wc -l | xargs)
     if [ "$fail_count" -gt 0 ]; then
         first_date=$(echo "$lines" | head -n 1 | awk '{print $1" "$2" "$3}')
@@ -31,6 +37,7 @@ for ip in $banned_list; do
         first_date="N/A"
         last_date="N/A"
     fi
+
     echo "$fail_count|$ip|$first_date|$last_date" >> "$temp_file"
 done
 
@@ -64,22 +71,35 @@ rm "$temp_file"
 ports_file=$(mktemp)
 users_file=$(mktemp)
 
-# Pour les ports, récupérer le numéro suivant "port", compter, trier et formater
-grep "Failed password" "$LOGFILE" | awk '{for(i=1;i<=NF;i++){if($i=="port"){print $(i+1)}}}' \
-  | sort | uniq -c | sort -nr | head -n 5 | awk '{print $2" "$1}' > "$ports_file"
+# Pour les ports : on vérifie l'existence du fichier avant le grep
+if [ -f "$LOGFILE" ]; then
+    grep "Failed password" "$LOGFILE" \
+      | awk '{for(i=1;i<=NF;i++){if($i=="port"){print $(i+1)}}}' \
+      | sort | uniq -c | sort -nr | head -n 5 | awk '{print $2" "$1}' \
+      > "$ports_file"
+else
+    : > "$ports_file"
+fi
 
-# Pour les users, gérer "invalid user" : si le mot après "for" est "invalid", le user est le 3ème token après.
-grep "Failed password" "$LOGFILE" | awk '{
-  for(i=1;i<=NF;i++){
-    if($i=="for"){
-      if($(i+1)=="invalid"){
-        print $(i+3)
-      } else {
-        print $(i+1)
-      }
-    }
-  }
-}' | sort | uniq -c | sort -nr | head -n 5 | awk '{print $2" "$1}' > "$users_file"
+# Pour les users : idem, on ne lance le grep que si le fichier existe
+if [ -f "$LOGFILE" ]; then
+    grep "Failed password" "$LOGFILE" \
+      | awk '{
+          for(i=1;i<=NF;i++){
+            if($i=="for"){
+              if($(i+1)=="invalid"){
+                print $(i+3)
+              } else {
+                print $(i+1)
+              }
+            }
+          }
+        }' \
+      | sort | uniq -c | sort -nr | head -n 5 | awk '{print $2" "$1}' \
+      > "$users_file"
+else
+    : > "$users_file"
+fi
 
 # Affichage du tableau combiné
 echo "${YELLOW}${BOLD}Top 5 Ports and Users${RESET}"
