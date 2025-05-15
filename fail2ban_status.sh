@@ -102,14 +102,16 @@ else
 fi
 
 # Affichage du tableau combiné
-echo "${YELLOW}${BOLD}Top 5 Ports and Users${RESET}"
-echo "${YELLOW}${BOLD}${sep}${RESET}"
-printf "%-20s %-20s\n" "Port (Attempts)" "User (Attempts)"
-echo "$sep"
-paste "$ports_file" "$users_file" | while IFS=$'\t' read -r port_line user_line; do
-    printf "%-20s %-20s\n" "$port_line" "$user_line"
-done
-echo ""
+if [ -s "$users_file" ] || [ -s "$ports_file" ]; then
+  echo "${YELLOW}${BOLD}Top 5 Ports and Users${RESET}"
+  echo "${YELLOW}${BOLD}${sep}${RESET}"
+  printf "%-20s %-20s\n" "Port (Attempts)" "User (Attempts)"
+  echo "$sep"
+  paste "$ports_file" "$users_file" | while IFS=$'\t' read -r port_line user_line; do
+      printf "%-20s %-20s\n" "$port_line" "$user_line"
+  done
+  echo ""
+fi
 
 rm "$ports_file" "$users_file"
 
